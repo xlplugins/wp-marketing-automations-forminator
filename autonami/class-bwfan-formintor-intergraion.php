@@ -1,4 +1,5 @@
 <?php
+
 final class BWFAN_Formintor_Integration extends BWFAN_Integration {
 
 	private static $instance = null;
@@ -28,4 +29,6 @@ final class BWFAN_Formintor_Integration extends BWFAN_Integration {
 	}
 }
 
-BWFAN_Load_Integrations::register( 'BWFAN_Formintor_Integration' );
+if ( bwfan_is_forminator_forms_active() ) {
+	BWFAN_Load_Integrations::register( 'BWFAN_Formintor_Integration' );
+}

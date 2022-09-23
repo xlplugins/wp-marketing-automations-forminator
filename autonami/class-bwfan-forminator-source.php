@@ -1,6 +1,6 @@
 <?php
 
-class BWFAN_FORMINATOR_Source1 extends BWFAN_Source {
+class BWFAN_FORMINATOR_Source extends BWFAN_Source {
 	private static $instance = null;
 
 	public function __construct() {
@@ -29,6 +29,6 @@ class BWFAN_FORMINATOR_Source1 extends BWFAN_Source {
 /**
  * Register this as a source.
  */
-if ( bwfan_is_wpforms_active() ) {
-	BWFAN_Load_Sources::register( 'BWFAN_FORMINATOR_Source1' );
+if ( bwfan_is_forminator_forms_active() ) {
+	BWFAN_Load_Sources::register( 'BWFAN_FORMINATOR_Source' );
 }
