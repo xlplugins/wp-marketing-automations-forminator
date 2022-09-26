@@ -1,6 +1,6 @@
 <?php
 
-final class BWFAN_FORMINATOR_Form_Submit1 extends BWFAN_Event {
+final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	private static $instance = null;
 	public $form_id = 0;
 	public $form_title = '';
@@ -542,5 +542,5 @@ final class BWFAN_FORMINATOR_Form_Submit1 extends BWFAN_Event {
  * This will show the current event in dropdown in single automation screen.
  */
 if ( bwfan_is_wpforms_active() ) {
-	return 'BWFAN_FORMINATOR_Form_Submit1';
+	return 'BWFAN_FORMINATOR_Form_Submit';
 }
