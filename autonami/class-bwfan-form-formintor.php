@@ -138,11 +138,11 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 
 		return $fields;
 	}
-    //  working on this part for integartion 
-	// how to fet Forminator for seletcion 
-	//  for This i need to sepnd some time on Forminator form documentaion
-	// still working to get form , form ids, form data from formiantor
-	// if you have any idea please share with me 
+    //  working on this part for integration 
+    // how to get Forminator for selection 
+    //  for This I need to spend some time on Forminator form documentation
+    /// I am still working on getting form, form ids, and form data from forminator
+    // if you have any ideas please share them with me 
 	public function get_form_selection( $args, $return_all_available = false ) {
 		/** Form ID Handling */
 		$forminator      = forminator()->form->get();
