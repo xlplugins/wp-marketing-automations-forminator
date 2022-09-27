@@ -145,9 +145,14 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
     // if you have any ideas please share them with me 
 	public function get_form_selection( $args, $return_all_available = false ) {
 		/** Form ID Handling */
-		$forminator      = forminator()->form->get();
-		$form_options = [];
+		$args = array(
+			'post_type' => 'forminator_forms',
+			'post_status' => 'publish',
+			'order' => 'ASC',
+			'numberposts' => -1
 
+		);
+		$forminator = get_posts($args);
 		foreach ( $forminator as $form ) {
 			$form_options[ $form->ID ] = $form->post_title;
 		}
