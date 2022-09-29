@@ -19,10 +19,9 @@ final class BWFAN_Forminator {
 
 	private function __construct() {
 
-		add_action( 'bwfan_loaded', [ $this, 'init_forminator' ] );
-		add_action( 'bwfan_before_automations_loaded', [ $this, 'add_modules' ] );
+		add_action( 'bwfan_loaded', array( $this, 'init_forminator' ) );
+		add_action( 'bwfan_before_automations_loaded', array( $this, 'add_modules' ) );
 	}
-
 	/**
 	 * @return void
 	 */
@@ -44,13 +43,13 @@ final class BWFAN_Forminator {
 		define( 'BWFAN_FORMINTOR_PLUGIN_DIR', __DIR__ );
 		define( 'BWFAN_FORMINTOR_PLUGIN_URL', untrailingslashit( plugin_dir_url( BWFAN_FORMINTOR_PLUGIN_FILE ) ) );
 
-		require_once (BWFAN_FORMINTOR_PLUGIN_DIR . '/includes/bwfan-forminator-functions.php');
+		require_once BWFAN_FORMINTOR_PLUGIN_DIR . '/includes/bwfan-forminator-functions.php';
 	}
 
 	public function add_modules() {
 		$integration_dir = BWFAN_FORMINTOR_PLUGIN_DIR . '/autonami';
 		foreach ( glob( $integration_dir . '/class-*.php' ) as $_field_filename ) {
-			require_once( $_field_filename );
+			require_once  $_field_filename ;
 		}
 	}
 
