@@ -23,15 +23,14 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 			'bwf_contact',
 			'bwf_contact_fields',
 			'bwf_contact_user',
-			'bwf_contact_wc',
-			'bwf_contact_geo',
-			'bwf_engagement',
-			'bwf_broadcast'
 		);
 		$this->optgroup_label         = esc_html__( 'Forminator', 'autonami-automations-pro' );
 		$this->priority               = 10;
 		$this->customer_email_tag     = '';
-		$this->v2                     = true;
+		// v2 and support_v1 property allows to control the visibility of this event in respective versions
+		$this->v2         = true;
+		$this->support_v1 = false;
+
 	}
 
 	public static function get_instance() {
@@ -43,167 +42,33 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	}
 
 	public function load_hooks() {
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_assets' ), 98 );
+		add_filter( 'bwfan_get_form_submit_events', array( $this, 'add_forminator_to_form_submit_events' ), 10, 1 );
 		add_action( 'wp_ajax_bwfan_get_forminator_form_fields', array( $this, 'bwfan_get_forminator_form_fields' ) );
-		add_action( 'forminatororm_after_submission', array( $this, 'process' ), 10, 4 );
-		add_filter( 'bwfan_all_event_js_data', array( $this, 'add_form_data' ), 10, 2 );
-	}
-
-	/**
-	 * Localize data for html fields for the current event.
-	 */
-	public function admin_enqueue_assets() {
-		if ( BWFAN_Common::is_load_admin_assets( 'automation' ) ) {
-			$data = $this->get_view_data();
-
-			BWFAN_Core()->admin->set_events_js_data( $this->get_slug(), 'form_options', $data );
-		}
+		add_action( 'forminatofrorm_after_submission', array( $this, 'process' ), 10, 4 );
 	}
 
 	public function get_view_data() {
 		$options = [];
-		$forms   = wpforms()->form->get();
+		$forms     = Forminator_API::get_forms( null, 1, 100, Forminator_Form_Model::STATUS_PUBLISH );
 
-		if ( ! empty( $forms ) ) {
+		if ( is_array( $forms ) ) {
 			foreach ( $forms as $form ) {
-				$options[ $form->ID ] = $form->post_title;
+				$options[ $form->id ] = $form->name;
 			}
 		}
-
 		return $options;
-	}
-
-	/**
-	 * Show the html fields for the current event.
-	 */
-	public function get_view( $db_eventmeta_saved_value ) {
-
-		?>
-        <script type="text/html" id="tmpl-event-<?php echo esc_html__( $this->get_slug() ); ?>">
-            <#
-            selected_form_id = (_.has(data, 'eventSavedData') &&_.has(data.eventSavedData, 'form_id')) ? data.eventSavedData.form_id : '';
-            selected_field_map = (_.has(data, 'eventSavedData') &&_.has(data.eventSavedData, 'email_map')) ? data.eventSavedData.email_map : '';
-            #>
-            <div class="bwfan-col-sm-12 bwfan-p-0 bwfan-mt-15 bwfan-mb-15">
-                <label for="" class="bwfan-label-title"><?php esc_html_e( 'Select Form', 'autonami-automations-pro' ); ?></label>
-                <select id="bwfan-forminator_form_submit_form_id" class="bwfan-input-wrapper" name="event_meta[form_id]">
-                    <option value=""><?php esc_html_e( 'Choose Form', 'autonami-automations-pro' ); ?></option>
-                    <#
-                    if(_.has(data.eventFieldsOptions, 'form_options') && _.isObject(data.eventFieldsOptions.form_options) ) {
-                    _.each( data.eventFieldsOptions.form_options, function( value, key ){
-                    selected =(key == selected_form_id)?'selected':'';
-                    #>
-                    <option value="{{key}}" {{selected}}>{{value}}</option>
-                    <# })
-                    } #>
-                </select>
-            </div>
-
-            <#
-            show_mapping = !_.isEmpty(selected_form_id)?'block':'none';
-            #>
-            <div class="bwfan-wpforms-forms-map bwfan-col-sm-12 bwfan-p-0 bwfan-mt-5">
-                <div class="bwfan_spinner bwfan_hide"></div>
-                <div class="bwfan-col-sm-12 bwfan-p-0 bwfan-wpforms-field-map" style="display:{{show_mapping}}">
-                    <label for="" class="bwfan-label-title"><?php esc_html_e( 'Map Email field if exists (optional)', 'autonami-automations-pro' ); ?></label>
-                    <select id="bwfan-wpforms_email_field_map" class="bwfan-input-wrapper" name="event_meta[email_map]">
-                        <option value=""><?php esc_html_e( 'None', 'autonami-automations-pro' ); ?></option>
-                        <#
-                        _.each( bwfan_events_js_data['wpforms_form_submit']['selected_form_fields'], function( value, key ){
-                        selected =(key == selected_field_map)?'selected':'';
-                        #>
-                        <option value="{{key}}" {{selected}}>{{value}}</option>
-                        <# })
-                        #>
-                    </select>
-                </div>
-            </div>
-        </script>
-        <script>
-            jQuery(document).on('change', '#bwfan-forminator_form_submit_form_id', function () {
-                var selected_id = jQuery(this).val();
-                bwfan_events_js_data['wpforms_form_submit']['selected_id'] = selected_id;
-                if (_.isEmpty(selected_id)) {
-                    jQuery(".bwfan-wpforms-field-map").hide();
-                    return false;
-                }
-                jQuery(".bwfan-wpforms-forms-map .bwfan_spinner").removeClass('bwfan_hide');
-                jQuery(".bwfan-wpforms-field-map").hide();
-                jQuery.ajax({
-                    method: 'post',
-                    url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
-                    datatype: "JSON",
-                    data: {
-                        action: 'bwfan_get_forminator_form_fields',
-                        id: selected_id,
-                    },
-                    success: function (response) {
-                        jQuery(".bwfan-wpforms-forms-map .bwfan_spinner").addClass('bwfan_hide');
-                        jQuery(".bwfan-wpforms-field-map").show();
-                        update_wpforms_email_field_map(response.fields);
-                        _
-                        bwfan_events_js_data['wpforms_form_submit']['selected_form_fields'] = response.fields;
-                    }
-                });
-            });
-
-            function update_wpforms_email_field_map(fields) {
-                jQuery("#bwfan-wpforms_email_field_map").html('');
-                var option = '<option value="">None</option>';
-                if (_.size(fields) > 0 && _.isObject(fields)) {
-                    _.each(fields, function (v, e) {
-                        option += '<option value="' + e + '">' + v + '</option>';
-                    });
-                }
-                jQuery("#bwfan-wpforms_email_field_map").html(option);
-            }
-
-            jQuery('body').on('bwfan-change-rule', function (e, v) {
-                if ('wpforms_form_field' !== v.value) {
-                    return;
-                }
-
-                var options = '';
-
-                _.each(bwfan_events_js_data['wpforms_form_submit']['selected_form_fields'], function (value, key) {
-                    options += '<option value="' + key + '">' + value + '</option>';
-                });
-
-                v.scope.find('.bwfan_wpforms_form_fields').html(options);
-            });
-
-            jQuery('body').on('bwfan-selected-merge-tag', function (e, v) {
-                if ('wpforms_form_field' !== v.tag) {
-                    return;
-                }
-
-                var options = '';
-                var i = 1;
-                var selected = '';
-
-                _.each(bwfan_events_js_data['wpforms_form_submit']['selected_form_fields'], function (value, key) {
-                    selected = (i == 1) ? 'selected' : '';
-                    options += '<option value="' + key + '" ' + selected + '>' + value + '</option>';
-                    i++;
-                });
-
-                jQuery('.bwfan_wpforms_form_fields').html(options);
-                jQuery('.bwfan_tag_select').trigger('change');
-            });
-        </script>
-		<?php
 	}
 
 	public function bwfan_get_forminator_form_fields() {
 		$form_id = absint( sanitize_text_field( $_POST['id'] ) ); // WordPress.CSRF.NonceVerification.NoNonceVerification
 		$fields  = [];
+		die($form_id );
 		if ( empty( $form_id ) ) {
 			wp_send_json( array(
 				'fields' => $fields,
 			) );
 		}
-		$fields = $this->get_form_fields( $form_id );
-
+		$fields  = Forminator_API::get_form_fields( $form_id );
 		/** fields for v2 */
 		if ( isset( $_POST['fromApp'] ) && $_POST['fromApp'] ) {
 			$finalarr = [];
@@ -266,24 +131,6 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 		$data['fields'] = $fields_array;
 		$this->send_async_call( $data );
 	}
-
-	public function add_form_data( $event_js_data, $automation_meta ) {
-		if ( ! isset( $automation_meta['event_meta'] ) || ! isset( $event_js_data['wpforms_form_submit'] ) || ! isset( $automation_meta['event_meta']['form_id'] ) ) {
-			return $event_js_data;
-		}
-
-		if ( isset( $automation_meta['event'] ) && ! empty( $automation_meta['event'] ) && 'wpforms_form_submit' !== $automation_meta['event'] ) {
-			return $event_js_data;
-		}
-
-		$event_js_data['wpforms_form_submit']['selected_id'] = $automation_meta['event_meta']['form_id'];
-		$fields                                              = $this->get_form_fields( $automation_meta['event_meta']['form_id'] );
-
-		$event_js_data['wpforms_form_submit']['selected_form_fields'] = $fields;
-
-		return $event_js_data;
-	}
-
 	/**
 	 * Set up rules data
 	 *
@@ -404,26 +251,6 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	}
 
 	/**
-	 * Validating form id after submission with the selected form id in the event
-	 *
-	 * @param $automations_arr
-	 *
-	 * @return mixed
-	 */
-	public function validate_event_data_before_creating_task( $automations_arr ) {
-		$automations_arr_temp = $automations_arr;
-
-		foreach ( $automations_arr as $automation_id => $automation_data ) {
-			$form_id = isset( $automation_data['event_meta']['form_id'] ) ? $automation_data['event_meta']['form_id'] : 0;
-			if ( absint( $this->form_id ) !== absint( $form_id ) ) {
-				unset( $automations_arr_temp[ $automation_id ] );
-			}
-		}
-
-		return $automations_arr_temp;
-	}
-
-	/**
 	 * v2 Method: Validate event settings
 	 *
 	 * @param $automation_data
@@ -534,8 +361,14 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 			]
 		];
 	}
+	public function add_forminator_to_form_submit_events( $events ) {
+		$events[] = 'BWFAN_FORMINATOR_Form_Submit';
+
+		return $events;
+	}
 
 }
+
 
 /**
  * Register this event to a source.
