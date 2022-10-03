@@ -21,19 +21,6 @@ final class BWFAN_Forminator {
 
 		add_action( 'bwfan_loaded', array( $this, 'init_forminator' ) );
 		add_action( 'bwfan_before_automations_loaded', array( $this, 'add_modules' ) );
-		//add_action( 'init', array( $this, 'test' ) );
-	}
-	public function test(){
-		$options = [];
-		$forms     = Forminator_API::get_forms( null, 1, 100, Forminator_Form_Model::STATUS_PUBLISH );
-
-		if ( is_array( $forms ) ) {
-			foreach ( $forms as $form ) {
-				$options[ $form->id ] = $form->name;
-			}
-		}
-
-		return $options;
 	}
 	/**
 	 * @return void

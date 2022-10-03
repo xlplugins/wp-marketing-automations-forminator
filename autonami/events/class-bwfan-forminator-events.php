@@ -62,20 +62,19 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	public function bwfan_get_forminator_form_fields() {
 		$form_id = absint( sanitize_text_field( $_POST['id'] ) ); // WordPress.CSRF.NonceVerification.NoNonceVerification
 		$fields  = [];
-		die($form_id );
 		if ( empty( $form_id ) ) {
 			wp_send_json( array(
 				'fields' => $fields,
 			) );
 		}
 		$fields  = Forminator_API::get_form_fields( $form_id );
-		/** fields for v2 */
+		//
 		if ( isset( $_POST['fromApp'] ) && $_POST['fromApp'] ) {
 			$finalarr = [];
 			foreach ( $fields as $key => $value ) {
 				$finalarr[] = [
 					'key'   => $key,
-					'value' => $value
+					'value' => $value->field_label
 				];
 			}
 
@@ -94,17 +93,11 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 			return array();
 		}
 
-		$form        = wpforms()->form->get( $form_id );
-		$form_fields = wpforms_decode( $form->post_content );
+		$form  = Forminator_API::get_form_fields( $form_id );
 		$fields      = array();
-
-		if ( ! empty( $form_fields['fields'] ) ) {
-			foreach ( $form_fields['fields'] as $field ) {
-				if ( isset( $field['isHidden'] ) && $field['isHidden'] ) {
-					continue;
-				}
-				$fields[ $field['id'] ] = $field['label'];
-			}
+		foreach ( $form as $field ) {
+			
+			$fields =  $field->field_label;
 		}
 
 		return $fields;
