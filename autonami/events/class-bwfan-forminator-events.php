@@ -44,7 +44,7 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	public function load_hooks() {
 		add_filter( 'bwfan_get_form_submit_events', array( $this, 'add_forminator_to_form_submit_events' ), 10, 1 );
 		add_action( 'wp_ajax_bwfan_get_forminator_form_fields', array( $this, 'bwfan_get_forminator_form_fields' ) );
-		add_action( 'forminatofrorm_after_submission', array( $this, 'process' ), 10, 4 );
+		add_action( 'forminator_form_after_save_entry', array( $this, 'process' ), 10, 1 );
 	}
 
 	public function get_view_data() {
@@ -356,7 +356,6 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	}
 	public function add_forminator_to_form_submit_events( $events ) {
 		$events[] = 'BWFAN_FORMINATOR_Form_Submit';
-
 		return $events;
 	}
 
@@ -367,6 +366,6 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
  * Register this event to a source.
  * This will show the current event in dropdown in single automation screen.
  */
-if ( bwfan_is_wpforms_active() ) {
+if ( bwfan_is_forminator_forms_active() ) {
 	return 'BWFAN_FORMINATOR_Form_Submit';
 }

@@ -9,9 +9,6 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 	private $form_title     = '';
 	private $fields         = array();
 	private $entry          = array();
-	private $entry_id       = array();
-	private $email          = array();
-	private $autonami_event = '';
 
 	public function get_source() {
 		return $this->source;
@@ -116,11 +113,14 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 	}
 
 	public function get_forminator_form_fields( $form_id ) {
-		$form = Forminator_API::get_form_fields(  $form_id );
+		$form         = $form  = Forminator_API::get_form_fields( $form_id );
+		$fields       = array();
 
-		
-		foreach ( $form as $forminator_fields ) {
-			$fields = $forminator_fields->field_label;
+		if ( ! empty( $form) ) {
+			foreach ( $form as $key => $field ) {
+
+				$fields[ $key  ] =$field->field_label;
+			}
 		}
 
 		return $fields;
@@ -133,16 +133,11 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 
 	public function get_form_selection( $args, $return_all_available = false ) {
 		/** Form ID Handling */
-		$args = array(
-			'post_type' => 'forminator_forms',
-			'post_status' => 'publish',
-			'order' => 'ASC',
-			'numberposts' => -1
+		$form_options = [];
+		$forms     = Forminator_API::get_forms( null, 1, 100, Forminator_Form_Model::STATUS_PUBLISH );
 
-		);
-		$forminator = get_posts($args);
-		foreach ( $forminator as $form ) {
-			$form_options[ $form->ID ] = $form->post_title;
+		foreach ( $forms as $form ) {
+			$form_options[ $form->id ] = $form->name;
 		}
 
 		$form_options = array( 'default' => $form_options );
@@ -192,7 +187,8 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 	}
 }
 
-
+if ( bwfan_is_forminator_forms_active() ) {
 	BWFCRM_Core()->forms->register( 'forminator', 'BWFCRM_Form_Forminator', 'Forminator', array(
 		'forminator_form_submit'
 	) );
+}
