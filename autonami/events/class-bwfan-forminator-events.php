@@ -44,7 +44,7 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	public function load_hooks() {
 		add_filter( 'bwfan_get_form_submit_events', array( $this, 'add_forminator_to_form_submit_events' ), 10, 1 );
 		add_action( 'wp_ajax_bwfan_get_forminator_form_fields', array( $this, 'bwfan_get_forminator_form_fields' ) );
-		add_action( 'forminator_form_after_save_entry', array( $this, 'process' ), 10, 1 );
+		add_action( 'forminator_form_after_save_entry', array( $this, 'process' ), 10, 2 );
 	}
 
 	public function get_view_data() {
@@ -103,7 +103,18 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 		return $fields;
 	}
 
-	public function process( $fields, $entry, $form_data, $entry_id ) {
+	public function process( $form_id, $response ) {
+
+		if( ! wp_doing_ajax() ){
+			// Swap variables when POST method
+			list( $form_id, $response ) = array( $response, $form_id );
+		}
+
+		if( ! in_array( $form_id, array_keys( $this->forms ) ) ){
+			return;
+		}
+
+		$entries = Forminator_API::get_entries( $form_id );
 
 		$data               = $this->get_default_data();
 		$data['entry']      = $entry;
