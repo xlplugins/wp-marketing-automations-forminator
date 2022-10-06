@@ -104,36 +104,26 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	}
 
 	public function process( $form_id, $response ) {
-
+		
 		if( ! wp_doing_ajax() ){
 			// Swap variables when POST method
 			list( $form_id, $response ) = array( $response, $form_id );
 		}
-
-		if( ! in_array( $form_id, array_keys( $this->forms ) ) ){
-			return;
-		}
-
 		$entries = Forminator_API::get_entries( $form_id );
-
 		$data               = $this->get_default_data();
-		$data['entry']      = $entry;
-		$data['form_id']    = $form_data['id'];
-		$data['form_title'] = isset( $form_data['id'] ) ? get_the_title( $form_data['id'] ) : '';
-		$data['entry_id']   = $entry_id;
+		$data['entry']      = ''; 
+		$data['form_id']    = $entries[0]->form_id;
+		$data['form_title'] = isset( $entries[0]->form_id ) ? get_the_title( $form_id ) : '';
+		$data['entry_id']   = $entries[0]->entry_id;
 		$fields_array       = [];
 
-		foreach ( $fields as $field ) {
-			$fields_array[ $field['id'] ] = $field['name'];
-
-			/** passing file upload data in the entry fields as upload data not coming in $entry */
-			if ( 'file-upload' === $field['type'] ) {
-				$data['entry']['fields'][ $field['id'] ] = $field['value'];
-			}
+		foreach ( $entries[0]->meta_data  as $field ) {
+			$fields_array[ $field['id'] ] = $field['value'];
 		}
 
 		$data['fields'] = $fields_array;
 		$this->send_async_call( $data );
+		 
 	}
 	/**
 	 * Set up rules data
@@ -300,7 +290,6 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 		$automation_data['first_name']              = $this->first_name;
 		$automation_data['last_name']               = $this->last_name;
 		$automation_data['contact_phone']           = $this->contact_phone;
-		$automation_data['mark_contact_subscribed'] = $this->mark_subscribe;
 		BWFAN_PRO_Common::maybe_create_update_contact( $automation_data );
 
 		return $automation_data;
