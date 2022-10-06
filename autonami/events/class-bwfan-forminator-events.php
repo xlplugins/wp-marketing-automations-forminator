@@ -68,12 +68,13 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 			) );
 		}
 		$fields  = Forminator_API::get_form_fields( $form_id );
+		
 		//
 		if ( isset( $_POST['fromApp'] ) && $_POST['fromApp'] ) {
 			$finalarr = [];
 			foreach ( $fields as $key => $value ) {
 				$finalarr[] = [
-					'key'   => $key,
+					'key'   => $value->element_id,
 					'value' => $value->field_label
 				];
 			}
@@ -104,11 +105,7 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	}
 
 	public function process( $form_id, $response ) {
-		
-		if( ! wp_doing_ajax() ){
-			// Swap variables when POST method
-			list( $form_id, $response ) = array( $response, $form_id );
-		}
+
 		$entries = Forminator_API::get_entries( $form_id );
 		$data               = $this->get_default_data();
 		$data['entry']      = ''; 
@@ -117,8 +114,8 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 		$data['entry_id']   = $entries[0]->entry_id;
 		$fields_array       = [];
 
-		foreach ( $entries[0]->meta_data  as $field ) {
-			$fields_array[ $field['id'] ] = $field['value'];
+		foreach ( $entries[0]->meta_data as $key => $field ) {
+			$fields_array[ $key ] = $field['value'];
 		}
 
 		$data['fields'] = $fields_array;
@@ -184,28 +181,6 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	}
 
 	/**
-	 * Make the view data for the current event which will be shown in task listing screen.
-	 *
-	 * @param $global_data
-	 *
-	 * @return false|string
-	 */
-	public function get_task_view( $global_data ) {
-		ob_start();
-		?>
-        <li>
-            <strong><?php echo esc_html__( 'Form ID:', 'autonami - automations - pro' ); ?> </strong>
-            <span><?php echo esc_html__( $global_data['form_id'] ); ?></span>
-        </li>
-        <li>
-            <strong><?php echo esc_html__( 'Form Title:', 'autonami - automations - pro' ); ?> </strong>
-			<?php echo esc_html__( $global_data['form_title'] ); ?>
-        </li>
-		<?php
-		return ob_get_clean();
-	}
-
-	/**
 	 * Set global data for all the merge tags which are supported by this event.
 	 *
 	 * @param $task_meta
@@ -252,6 +227,7 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	 * @return bool
 	 */
 	public function validate_v2_event_settings( $automation_data ) {
+
 		if ( absint( $automation_data['form_id'] ) !== absint( $automation_data['event_meta']['bwfan-forminator_form_submit_form_id'] ) ) {
 			return false;
 		}
