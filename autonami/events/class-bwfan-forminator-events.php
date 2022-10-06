@@ -74,19 +74,15 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 			$finalarr = [];
 			foreach ( $fields as $key => $value ) {
 				$finalarr[] = [
-					'key'   => $value->element_id,
-					'value' => $value->field_label
+					'key'   => $value->__get('element_id'),
+					'value' => $value->__get('field_label')
 				];
 			}
-
 			wp_send_json( array(
 				'results' => $finalarr
 			) );
 			exit;
 		}
-		wp_send_json( array(
-			'fields' => $fields,
-		) );
 	}
 
 	public function get_form_fields( $form_id ) {
@@ -108,7 +104,7 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 
 		$entries = Forminator_API::get_entries( $form_id );
 		$data               = $this->get_default_data();
-		$data['entry']      = ''; 
+		$data['entry']      = $entries; 
 		$data['form_id']    = $entries[0]->form_id;
 		$data['form_title'] = isset( $entries[0]->form_id ) ? get_the_title( $form_id ) : '';
 		$data['entry_id']   = $entries[0]->entry_id;
@@ -199,22 +195,6 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 			BWFAN_Merge_Tag_Loader::set_data( $set_data );
 		}
 	}
-
-	/**
-	 * Capture the async data for the current event.
-	 * @return array|bool
-	 */
-	public function capture_async_data() {
-		$this->form_id    = BWFAN_Common::$events_async_data['form_id'];
-		$this->form_title = BWFAN_Common::$events_async_data['form_title'];
-		$this->entry      = BWFAN_Common::$events_async_data['entry'];
-		$this->fields     = BWFAN_Common::$events_async_data['fields'];
-		$this->entry_id   = BWFAN_Common::$events_async_data['entry_id'];
-		$this->email      = isset( BWFAN_Common::$events_async_data['email'] ) ? BWFAN_Common::$events_async_data['email'] : '';
-
-		return $this->run_automations();
-	}
-
 	public function get_email_event() {
 		return is_email( $this->email ) ? $this->email : false;
 	}
@@ -240,8 +220,10 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	 * @return array|bool
 	 */
 	public function capture_v2_data( $automation_data ) {
+
+		
 		$map_fields           = isset( $automation_data['event_meta']['bwfan-form-field-map'] ) ? $automation_data['event_meta']['bwfan-form-field-map'] : [];
-		$email_map            = isset( $map_fields['bwfan_email_field_map'] ) ? $map_fields['bwfan_email_field_map'] : '';
+		$email_map            = isset( $map_fields['bwfan_email_field_map'] ) ? $map_fields['bwfan_email_field_map'] : 'test@test.com';
 		$first_name_map       = isset( $map_fields['bwfan_first_name_field_map'] ) ? $map_fields['bwfan_first_name_field_map'] : '';
 		$last_name_map        = isset( $map_fields['bwfan_last_name_field_map'] ) ? $map_fields['bwfan_last_name_field_map'] : '';
 		$phone_map            = isset( $map_fields['bwfan_phone_field_map'] ) ? $map_fields['bwfan_phone_field_map'] : '';
