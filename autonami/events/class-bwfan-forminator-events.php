@@ -84,36 +84,26 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 			exit;
 		}
 	}
-
-	public function get_form_fields( $form_id ) {
-		if ( empty( $form_id ) ) {
-			return array();
-		}
-
-		$form  = Forminator_API::get_form_fields( $form_id );
-		$fields      = array();
-		foreach ( $form as $field ) {
-			
-			$fields =  $field->field_label;
-		}
-
-		return $fields;
-	}
-
+	
 	public function process( $form_id, $response ) {
 
-		$entries = Forminator_API::get_entries( $form_id );
+		$formdata = Forminator_API::get_entries( $form_id );
+		$fields  = Forminator_API::get_form_fields( $form_id );
+		
 		$data               = $this->get_default_data();
-		$data['entry']      = $entries; 
-		$data['form_id']    = $entries[0]->form_id;
-		$data['form_title'] = isset( $entries[0]->form_id ) ? get_the_title( $form_id ) : '';
-		$data['entry_id']   = $entries[0]->entry_id;
+		$data['form_id']    = $formdata[0]->form_id;
+		$data['form_title'] = isset( $formdata[0]->form_id ) ? get_the_title( $form_id ) : '';
+		$data['entry_id']   = $formdata[0]->entry_id;
 		$fields_array       = [];
-
-		foreach ( $entries[0]->meta_data as $key => $field ) {
-			$fields_array[ $key ] = $field['value'];
+		$entries      = array();
+		foreach ( $formdata[0]->meta_data as $key => $field ) {
+			$entries[ $key ] = $field['value'];
+			
 		}
-
+		foreach ( $fields as $key => $value ) {
+			$fields_array[ $value->__get('element_id')]  = $value->__get('field_label');
+		}
+		$data['entry']  = $entries;
 		$data['fields'] = $fields_array;
 		$this->send_async_call( $data );
 		 
@@ -220,25 +210,32 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	 * @return array|bool
 	 */
 	public function capture_v2_data( $automation_data ) {
-
 		
 		$map_fields           = isset( $automation_data['event_meta']['bwfan-form-field-map'] ) ? $automation_data['event_meta']['bwfan-form-field-map'] : [];
-		$email_map            = isset( $map_fields['bwfan_email_field_map'] ) ? $map_fields['bwfan_email_field_map'] : 'test@test.com';
-		$first_name_map       = isset( $map_fields['bwfan_first_name_field_map'] ) ? $map_fields['bwfan_first_name_field_map'] : '';
-		$last_name_map        = isset( $map_fields['bwfan_last_name_field_map'] ) ? $map_fields['bwfan_last_name_field_map'] : '';
-		$phone_map            = isset( $map_fields['bwfan_phone_field_map'] ) ? $map_fields['bwfan_phone_field_map'] : '';
-		$this->mark_subscribe = isset( $automation_data['event_meta']['bwfan-mark-contact-subscribed'] ) ? $automation_data['event_meta']['bwfan-mark-contact-subscribed'] : 0;
+		$get_email =            $automation_data['event_meta']['bwfan-form-field-map']['bwfan_email_field_map'];
+		$get_first_name  =            $automation_data['event_meta']['bwfan-form-field-map']['bwfan_first_name_field_map'];
+		$get_last_name  =            $automation_data['event_meta']['bwfan-form-field-map']['bwfan_last_name_field_map'];
+		$get_contact_phone =            $automation_data['event_meta']['bwfan-form-field-map']['bwfan_phone_field_map'];
 
+		$email_map            = isset( $automation_data['entry'][$get_email] ) ? $automation_data['entry'][$get_email] : '' ;
+		$first_name_map       = isset( $automation_data['entry'][$get_first_name] ) ? $automation_data['entry'][$get_first_name] : '' ;
+		$last_name_map        = isset( $automation_data['entry'][$get_last_name] ) ? $automation_data['entry'][$get_last_name] : '' ;
+		$phone_map            = isset( $automation_data['entry'][$get_contact_phone] ) ? $automation_data['entry'][$get_contact_phone] : '' ;
+		
+		
+		$this->mark_subscribe = isset( $automation_data['event_meta']['bwfan-mark-contact-subscribed'] ) ? $automation_data['event_meta']['bwfan-mark-contact-subscribed'] : 0;
+		
 		$this->form_id       = BWFAN_Common::$events_async_data['form_id'];
 		$this->form_title    = BWFAN_Common::$events_async_data['form_title'];
 		$this->entry         = BWFAN_Common::$events_async_data['entry'];
 		$this->fields        = BWFAN_Common::$events_async_data['fields'];
 		$this->entry_id      = BWFAN_Common::$events_async_data['entry_id'];
-		$this->email         = ( ! empty( $email_map ) && isset( $this->entry['fields'][ $email_map ] ) && is_email( $this->entry['fields'][ $email_map ] ) ) ? $this->entry['fields'][ $email_map ] : '';
-		$this->first_name    = ( ! empty( $first_name_map ) && isset( $this->entry['fields'][ $first_name_map ] ) ) ? $this->entry['fields'][ $first_name_map ] : '';
-		$this->last_name     = ( ! empty( $last_name_map ) && isset( $this->entry['fields'][ $last_name_map ] ) ) ? $this->entry['fields'][ $last_name_map ] : '';
-		$this->contact_phone = ( ! empty( $phone_map ) && isset( $this->entry['fields'][ $phone_map ] ) ) ? $this->entry['fields'][ $phone_map ] : '';
 
+		$this->email         = $email_map;
+		$this->first_name    = $first_name_map ;
+		$this->last_name     = $last_name_map;
+		$this->contact_phone = $phone_map ;
+		
 		$automation_data['form_id']                 = $this->form_id;
 		$automation_data['form_title']              = $this->form_title;
 		$automation_data['fields']                  = $this->fields;
@@ -248,6 +245,7 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 		$automation_data['first_name']              = $this->first_name;
 		$automation_data['last_name']               = $this->last_name;
 		$automation_data['contact_phone']           = $this->contact_phone;
+		$automation_data['mark_contact_subscribed'] = $this->mark_subscribe;
 		BWFAN_PRO_Common::maybe_create_update_contact( $automation_data );
 
 		return $automation_data;
