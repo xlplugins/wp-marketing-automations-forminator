@@ -242,7 +242,7 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 		$automation_data['entry_id']                = $this->entry;
 		$automation_data['first_name']              = $this->first_name  ;
 		$automation_data['last_name']               = $this->last_name;
-		$automation_data['contact_phone']           =  "1235";
+		$automation_data['contact_phone']           = $this->contact_phone;
 		BWFAN_PRO_Common::maybe_create_update_contact( $automation_data );
 		return $automation_data;
 	}
