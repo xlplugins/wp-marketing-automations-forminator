@@ -244,8 +244,6 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 		$automation_data['last_name']               = $this->last_name;
 		$automation_data['contact_phone']           =  "1235";
 		BWFAN_PRO_Common::maybe_create_update_contact( $automation_data );
-		BWFAN_Common::log_test_data( array( 'first_name_map221' =>$automation_data), 'first_name_map221', true );
-
 		return $automation_data;
 	}
 
