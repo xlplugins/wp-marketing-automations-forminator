@@ -14,7 +14,7 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	public $contact_phone = '';
 
 	private function __construct() {
-		$this->event_merge_tag_groups = array(  'bwf_contact' );
+		$this->event_merge_tag_groups = array(  'forminator_forms' );// merg tags groups 
 		$this->event_name             = esc_html__( 'Form Submits', 'autonami-automations-pro' );
 		$this->event_desc             = esc_html__( 'This event runs after a form is submitted', 'autonami-automations-pro' );
 		$this->event_rule_groups      = array(

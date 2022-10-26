@@ -21,6 +21,7 @@ final class BWFAN_Forminator {
 
 		add_action( 'bwfan_loaded', [ $this, 'init_forminator' ] );
 		add_action( 'bwfan_before_automations_loaded', [ $this, 'add_modules' ] );
+		add_action( 'bwfan_merge_tags_loaded', [ $this, 'load_merge_tags' ] );
 	}
 
 	/**
@@ -50,6 +51,16 @@ final class BWFAN_Forminator {
 	public function add_modules() {
 		$integration_dir = BWFAN_FORMINTOR_PLUGIN_DIR . '/autonami';
 		foreach ( glob( $integration_dir . '/class-*.php' ) as $_field_filename ) {
+			require_once( $_field_filename );
+		}
+	}
+	/**
+	 * Include Merge Tags files
+	 */
+	public function load_merge_tags() {
+		/** Merge tags in root folder */
+		$dir = BWFAN_FORMINTOR_PLUGIN_DIR . '/merge_tags';
+		foreach ( glob( $dir . '/class-*.php' ) as $_field_filename ) {
 			require_once( $_field_filename );
 		}
 	}
