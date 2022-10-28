@@ -21,11 +21,8 @@ final class BWFAN_Forminator {
 
 		add_action( 'bwfan_loaded', [ $this, 'init_forminator' ] );
 		add_action( 'bwfan_before_automations_loaded', [ $this, 'add_modules' ] );
-<<<<<<< Updated upstream
-=======
 		add_action( 'bwfan_merge_tags_loaded', [ $this, 'load_merge_tags' ] );
 		add_action( 'bwfan_rules_included', [ $this, 'include_rules' ] );
->>>>>>> Stashed changes
 	}
 
 	/**
@@ -58,8 +55,6 @@ final class BWFAN_Forminator {
 			require_once( $_field_filename );
 		}
 	}
-<<<<<<< Updated upstream
-=======
 	/**
 	 * Include Merge Tags files
 	 */
@@ -75,7 +70,6 @@ final class BWFAN_Forminator {
 			include_once BWFAN_FORMINTOR_PLUGIN_DIR . '/rules/class-bwfan-forminator-rules.php';
 		}
 	}
->>>>>>> Stashed changes
 
 }
 BWFAN_Forminator::get_instance();
