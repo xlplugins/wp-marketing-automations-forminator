@@ -116,8 +116,8 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 	}
 
 	public function get_forminator_form_fields( $form_id ) {
-		$form  = Forminator_API::get_form_fields( $form_id );
-		$fields       = array();
+		$form       = Forminator_API::get_form_fields( $form_id );
+		$fields     = array();
 
 		if ( ! empty( $form) ) {
 			foreach ( $form as $key => $field ) {

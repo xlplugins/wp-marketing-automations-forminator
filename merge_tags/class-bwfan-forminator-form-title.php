@@ -1,18 +1,15 @@
 <?php
-/**
- * Merg tags register for forminator Entry id 
- */
 
-class BWFAN_Forminator_Entry_ID extends BWFAN_Merge_Tag {
+class BWFAN_Forminator_Form_Title extends BWFAN_Merge_Tag {
 
 	private static $instance = null;
 	protected $support_v2 = true;
 	protected $support_v1 = false;
 
 	public function __construct() {
-		$this->tag_name        = 'forminator_entry_id';
-		$this->tag_description = __( 'Entry ID', 'autonami-automations-pro' );
-		add_shortcode( 'bwfan_forminator_entry_id', array( $this, 'parse_shortcode' ) );
+		$this->tag_name        = 'forminator_form_title';
+		$this->tag_description = __( 'Form Title', 'autonami-automations-pro' );
+		add_shortcode( 'bwfan_forminator_form_title', array( $this, 'parse_shortcode' ) );
 	}
 
 	public static function get_instance() {
@@ -37,9 +34,9 @@ class BWFAN_Forminator_Entry_ID extends BWFAN_Merge_Tag {
 			return $this->parse_shortcode_output( $this->get_dummy_preview(), $attr );
 		}
 
-		$entry_id = $get_data['entry_id'];
+		$form_title = $get_data['form_title'];
 
-		return $this->parse_shortcode_output( $entry_id, $attr );
+		return $this->parse_shortcode_output( $form_title, $attr );
 	}
 
 	/**
@@ -50,15 +47,15 @@ class BWFAN_Forminator_Entry_ID extends BWFAN_Merge_Tag {
 	 * @todo:Hard values shouldn't be passed
 	 */
 	public function get_dummy_preview() {
-		return '10';
+		return 'abcd';
 	}
 
 
 }
 
 /**
- * Register this merge tag to a group. if forminator addon is activated.
+ * Register this merge tag to a group.
  */
-if ( function_exists( 'bwfan_is_forminator_forms_active' ) ) {
-	BWFAN_Merge_Tag_Loader::register( 'forminator_forms', 'BWFAN_Forminator_Entry_ID', null, 'Forminator Forms' );
+if ( function_exists( 'bwfan_is_forminator_forms_active' )  ) {
+	BWFAN_Merge_Tag_Loader::register( 'forminator_forms', 'BWFAN_Forminator_Form_Title' );
 }

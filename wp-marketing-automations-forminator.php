@@ -22,7 +22,6 @@ final class BWFAN_Forminator {
 		add_action( 'bwfan_loaded', [ $this, 'init_forminator' ] );
 		add_action( 'bwfan_before_automations_loaded', [ $this, 'add_modules' ] );
 		add_action( 'bwfan_merge_tags_loaded', [ $this, 'load_merge_tags' ] );
-		add_action( 'bwfan_rules_included', [ $this, 'include_rules' ] );
 	}
 
 	/**
@@ -63,11 +62,6 @@ final class BWFAN_Forminator {
 		$dir = BWFAN_FORMINTOR_PLUGIN_DIR . '/merge_tags';
 		foreach ( glob( $dir . '/class-*.php' ) as $_field_filename ) {
 			require_once( $_field_filename );
-		}
-	}
-	public function include_rules() {
-		if ( bwfan_is_forminator_forms_active() ) {
-			include_once BWFAN_FORMINTOR_PLUGIN_DIR . '/rules/class-bwfan-forminator-rules.php';
 		}
 	}
 
