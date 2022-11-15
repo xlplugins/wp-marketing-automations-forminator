@@ -43,6 +43,11 @@ final class BWFAN_Forminator {
 		define( 'BWFAN_FORMINTOR_PLUGIN_URL', untrailingslashit( plugin_dir_url( BWFAN_FORMINTOR_PLUGIN_FILE ) ) );
 
 		require_once BWFAN_FORMINTOR_PLUGIN_DIR . '/includes/bwfan-forminator-functions.php';
+		$this->load_rules();
+	}
+
+	public function load_rules() {
+		include_once BWFAN_FORMINTOR_PLUGIN_DIR . '/rules/class-bwfan-rules.php';
 	}
 
 	public function add_modules() {
