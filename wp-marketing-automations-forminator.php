@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name: Autonami Marketing Automations FORMINTOR
+ * Plugin Name: Autonami Marketing Automations Forminator
  * Plugin URI: https://buildwoofunnels.com
  * Description:Formination with Autonami Marketing Automations
  * Version: 1.0.0
@@ -12,7 +12,6 @@
  * Text Domain: autonami-automations-pro
  */
 
-//return;
 final class BWFAN_Forminator {
 	// instance
 	private static $_instance = null;
@@ -28,10 +27,12 @@ final class BWFAN_Forminator {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
+
+		return self::$_instance;
 	}
 
 	/**
-	 * initializing lms
+	 * initializing forminator
 	 * @return void
 	 */
 	public function init_forminator() {

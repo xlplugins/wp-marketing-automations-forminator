@@ -44,7 +44,7 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	public function load_hooks() {
 		add_filter( 'bwfan_get_form_submit_events', array( $this, 'add_forminator_to_form_submit_events' ), 10, 1 );
 		add_action( 'wp_ajax_bwfan_get_forminator_form_fields', array( $this, 'bwfan_get_forminator_form_fields' ) );
-		add_action( 'forminator_form_after_save_entry', array( $this, 'process' ), 10, 2 );
+		add_action( 'forminator_form_after_save_entry', array( $this, 'process' ), 10);
 	}
 
 	public function get_view_data() {
@@ -70,8 +70,6 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 		}
 		$fields = $this->get_form_fields( $form_id );
 
-		//
-		if ( isset( $_POST['fromApp'] ) && $_POST['fromApp'] ) {
 			$finalarr = [];
 			foreach ( $fields as $key => $value ) {
 				$finalarr[] = [
@@ -79,18 +77,18 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 					'value' => $value->__get( 'field_label' )
 				];
 			}
+
 			wp_send_json( array(
 				'results' => $finalarr
 			) );
 			exit;
-		}
 	}
 
 	public function get_form_fields( $form_id ) {
 		return Forminator_API::get_form_fields( $form_id );
 	}
 
-	public function process( $form_id, $response ) {
+	public function process( $form_id ) {
 
 		$formdata = Forminator_API::get_entries( $form_id );
 		$fields   = Forminator_API::get_form_fields( $form_id );
@@ -105,7 +103,7 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 			$entries[ $key ] = $field['value'];
 
 		}
-		foreach ( $fields as $key => $value ) {
+		foreach ( $fields as $value ) {
 			$fields_array[ $value->__get( 'element_id' ) ] = $value->__get( 'field_label' );
 		}
 		$data['entry']  = $entries;
@@ -217,7 +215,6 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 	 * @return array|bool
 	 */
 	public function capture_v2_data( $automation_data ) {
-		$map_fields        = isset( $automation_data['event_meta']['bwfan-form-field-map'] ) ? $automation_data['event_meta']['bwfan-form-field-map'] : [];
 		$get_email         = $automation_data['event_meta']['bwfan-form-field-map']['bwfan_email_field_map'];
 		$get_first_name    = $automation_data['event_meta']['bwfan-form-field-map']['bwfan_first_name_field_map'];
 		$get_last_name     = $automation_data['event_meta']['bwfan-form-field-map']['bwfan_last_name_field_map'];
