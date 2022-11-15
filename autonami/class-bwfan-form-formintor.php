@@ -9,6 +9,8 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 	private $form_title     = '';
 	private $fields         = array();
 	private $entry          = array();
+	private $email = '';
+	private $autonami_event = '';
 
 	public function get_source() {
 		return $this->source;
@@ -38,6 +40,7 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 		$this->form_title     = BWFAN_Common::$events_async_data['form_title'];
 		$this->entry          = BWFAN_Common::$events_async_data['entry'];
 		$this->fields         = BWFAN_Common::$events_async_data['fields'];
+		$this->email      = isset( BWFAN_Common::$events_async_data['email'] ) ? BWFAN_Common::$events_async_data['email'] : '';
 		$this->autonami_event = BWFAN_Common::$events_async_data['event'];
 
 		$this->find_feeds_and_create_contacts();
@@ -56,38 +59,10 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 
 	public function prepare_contact_data_from_feed_entry( $mapped_fields ) {
 		$contact_data = array();
-		foreach ( $this->entry['fields'] as $key => $item ) {
-			/** for first_name and last_name*/
-			if ( isset( $mapped_fields[ $key . '.1' ] ) ) {
-				$first_name_key                 = $key . '.1';
-				$contact_field                  = is_numeric( $mapped_fields[ $first_name_key ] ) ? absint( $mapped_fields[ $first_name_key ] ) : $mapped_fields[ $first_name_key ];
-				$field_value                    = isset( $item['first'] ) ? $item['first'] : '';
-				$contact_data[ $contact_field ] = $field_value;
-			}
-
-			if ( isset( $mapped_fields[ $key . '.2' ] ) ) {
-				$last_name_key                  = $key . '.2';
-				$contact_field                  = is_numeric( $mapped_fields[ $last_name_key ] ) ? absint( $mapped_fields[ $last_name_key ] ) : $mapped_fields[ $last_name_key ];
-				$field_value                    = isset( $item['last'] ) ? $item['last'] : '';
-				$contact_data[ $contact_field ] = $field_value;
-			}
-
-			if ( isset( $mapped_fields[ $key . '.3' ] ) ) {
-				$middle_name_key                = $key . '.3';
-				$contact_field                  = is_numeric( $mapped_fields[ $middle_name_key ] ) ? absint( $mapped_fields[ $middle_name_key ] ) : $mapped_fields[ $middle_name_key ];
-				$field_value                    = isset( $item['middle'] ) ? $item['middle'] : '';
-				$contact_data[ $contact_field ] = $field_value;
-			}
-
+		foreach ( $this->entry as $key => $item ) {
 			if ( isset( $mapped_fields[ $key ] ) ) {
-				$contact_field = is_numeric( $mapped_fields[ $key ] ) ? absint( $mapped_fields[ $key ] ) : $mapped_fields[ $key ];
-
-				/** if value is in array */
-				if ( is_array( $item ) ) {
-					$item = wp_json_encode( $item );
-				}
-
-				$contact_data[ $contact_field ] = $item;
+				$contact_field                  = is_numeric( $mapped_fields[ $key ] ) ? absint( $mapped_fields[ $key ] ) : $mapped_fields[ $key ];
+				$contact_data[ $contact_field ] = $this->entry[ $key ];
 			}
 		}
 
@@ -113,17 +88,24 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 	}
 
 	public function get_forminator_form_fields( $form_id ) {
-		$form         = $form  = Forminator_API::get_form_fields( $form_id );
-		$fields       = array();
-
-		if ( ! empty( $form) ) {
-			foreach ( $form as $key => $field ) {
-
-				$fields[ $key  ] =$field->field_label;
-			}
+		if ( empty( $form_id ) ) {
+			return BWFCRM_Common::crm_error( __( 'Form Feed doesn\'t have sufficient data to get fields: ' . $form_id, 'wp-marketing-automations-crm' ) );
 		}
 
-		return $fields;
+		/** @var BWFAN_FORMINATOR_Form_Submit $event */
+		$event = BWFAN_Core()->sources->get_event( 'forminator_form_submit' );
+		if ( ! $event instanceof BWFAN_FORMINATOR_Form_Submit ) {
+			return BWFCRM_Common::crm_error( __( 'Form Funnelkit Automations Event doesn\'t found for Feed: ' . $form_id, 'wp-marketing-automations-crm' ) );
+		}
+
+		$finalarr = [];
+
+		$fields = $event->get_form_fields( $form_id );
+		foreach ( $fields as $value ) {
+			$finalarr[ $value->__get( 'element_id' ) ] = $value->__get( 'field_label' );
+		}
+
+		return $finalarr;
 	}
 	/**
 	 * Select form

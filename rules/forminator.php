@@ -33,7 +33,7 @@ if ( function_exists( 'bwfan_is_forminator_forms_active' ) && bwfan_is_forminato
 				$ins = BWFAN_Forminator_Form_Submit::get_instance();
 
 				$fields = $ins->get_form_fields( $form_id );
-				foreach ( $fields as $key => $value ) {
+				foreach ( $fields as $value ) {
 					$finalarr[ $value->__get( 'element_id' ) ] = $value->__get( 'field_label' );
 				}
 
@@ -48,7 +48,8 @@ if ( function_exists( 'bwfan_is_forminator_forms_active' ) && bwfan_is_forminato
 				if ( ! isset( $automation_data['global'] ) || ! is_array( $automation_data['global'] ) ) {
 					return $this->return_is_match( false, $rule_data );
 				}
-				$entry = isset( $automation_data['global']['entry']['fields'] ) ? $automation_data['global']['entry']['fields'] : [];
+
+				$entry = isset( $automation_data['global']['entry'] ) ? $automation_data['global']['entry'] : [];
 
 				$type        = $rule_data['rule'];
 				$data        = $rule_data['data'];
