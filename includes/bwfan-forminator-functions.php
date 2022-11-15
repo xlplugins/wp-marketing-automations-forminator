@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 if ( ! function_exists( 'bwfan_is_forminator_forms_active' ) ) {
 	function bwfan_is_forminator_forms_active() {
-		$active_plugins =  (array) get_option( 'active_plugins', array() );
+		$active_plugins = (array) get_option( 'active_plugins', array() );
 		if ( class_exists( 'Forminator' ) ) {
 			return true;
 		}

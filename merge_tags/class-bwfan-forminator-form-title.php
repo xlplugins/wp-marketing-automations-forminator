@@ -56,6 +56,6 @@ class BWFAN_Forminator_Form_Title extends BWFAN_Merge_Tag {
 /**
  * Register this merge tag to a group.
  */
-if ( function_exists( 'bwfan_is_forminator_forms_active' )  ) {
+if ( function_exists( 'bwfan_is_forminator_forms_active' ) ) {
 	BWFAN_Merge_Tag_Loader::register( 'forminator_forms', 'BWFAN_Forminator_Form_Title' );
 }

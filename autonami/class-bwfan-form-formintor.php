@@ -2,13 +2,13 @@
 
 class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 	private $total_selections = 1;
-	private $source           = 'forminator';
+	private $source = 'forminator';
 
 	/** Form Submission Captured Data */
-	private $form_id        = '';
-	private $form_title     = '';
-	private $fields         = array();
-	private $entry          = array();
+	private $form_id = '';
+	private $form_title = '';
+	private $fields = array();
+	private $entry = array();
 	private $email = '';
 	private $autonami_event = '';
 
@@ -30,6 +30,7 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 
 		return $url;
 	}
+
 	/**
 	 * Async
 	 *
@@ -40,7 +41,7 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 		$this->form_title     = BWFAN_Common::$events_async_data['form_title'];
 		$this->entry          = BWFAN_Common::$events_async_data['entry'];
 		$this->fields         = BWFAN_Common::$events_async_data['fields'];
-		$this->email      = isset( BWFAN_Common::$events_async_data['email'] ) ? BWFAN_Common::$events_async_data['email'] : '';
+		$this->email          = isset( BWFAN_Common::$events_async_data['email'] ) ? BWFAN_Common::$events_async_data['email'] : '';
 		$this->autonami_event = BWFAN_Common::$events_async_data['event'];
 
 		$this->find_feeds_and_create_contacts();
@@ -83,7 +84,7 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 		if ( empty( $form_id ) ) {
 			return BWFCRM_Common::crm_error( __( 'Form Feed doesn\'t have sufficient data to get fields: ' . $feed_id, 'wp-marketing-automations-crm' ) );
 		}
-	
+
 		return $this->get_forminator_form_fields( $form_id );
 	}
 
@@ -107,6 +108,7 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 
 		return $finalarr;
 	}
+
 	/**
 	 * Select form
 	 *
@@ -116,7 +118,7 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 	public function get_form_selection( $args, $return_all_available = false ) {
 		/** Form ID Handling */
 		$form_options = [];
-		$forms     = Forminator_API::get_forms( null, 1, 100, Forminator_Form_Model::STATUS_PUBLISH );
+		$forms        = Forminator_API::get_forms( null, 1, 100, Forminator_Form_Model::STATUS_PUBLISH );
 
 		foreach ( $forms as $form ) {
 			$form_options[ $form->id ] = $form->name;

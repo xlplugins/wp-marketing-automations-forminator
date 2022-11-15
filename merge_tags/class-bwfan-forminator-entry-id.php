@@ -1,6 +1,6 @@
 <?php
 /**
- * Merg tags register for forminator Entry id 
+ * Merg tags register for forminator Entry id
  */
 
 class BWFAN_Forminator_Entry_ID extends BWFAN_Merge_Tag {
