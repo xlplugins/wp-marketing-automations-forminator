@@ -2,16 +2,13 @@
 
 class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 	private $total_selections = 1;
-	private $source = 'forminator';
+	private $source           = 'forminator';
 
 	/** Form Submission Captured Data */
-	private $form_id = '';
-	private $form_title = '';
-	private $fields = [];
-	private $entry = [];
-	private $entry_id = [];
-	private $email = [];
-	private $autonami_event = '';
+	private $form_id        = '';
+	private $form_title     = '';
+	private $fields         = array();
+	private $entry          = array();
 
 	public function get_source() {
 		return $this->source;
@@ -31,12 +28,16 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 
 		return $url;
 	}
+	/**
+	 * Async
+	 *
+	 */
 
 	public function capture_async_submission() {
-		$this->form_id    = BWFAN_Common::$events_async_data['form_id'];
-		$this->form_title = BWFAN_Common::$events_async_data['form_title'];
-		$this->entry      = BWFAN_Common::$events_async_data['entry'];
-		$this->fields     = BWFAN_Common::$events_async_data['fields'];
+		$this->form_id        = BWFAN_Common::$events_async_data['form_id'];
+		$this->form_title     = BWFAN_Common::$events_async_data['form_title'];
+		$this->entry          = BWFAN_Common::$events_async_data['entry'];
+		$this->fields         = BWFAN_Common::$events_async_data['fields'];
 		$this->autonami_event = BWFAN_Common::$events_async_data['event'];
 
 		$this->find_feeds_and_create_contacts();
@@ -54,7 +55,7 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 	}
 
 	public function prepare_contact_data_from_feed_entry( $mapped_fields ) {
-		$contact_data = [];
+		$contact_data = array();
 		foreach ( $this->entry['fields'] as $key => $item ) {
 			/** for first_name and last_name*/
 			if ( isset( $mapped_fields[ $key . '.1' ] ) ) {
@@ -94,6 +95,7 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 	}
 
 	public function get_form_fields( $feed ) {
+
 		if ( ! $feed instanceof BWFCRM_Form_Feed ) {
 			return BWFCRM_Common::crm_error( __( 'Feed  not Exists: ', 'wp-marketing-automations-crm' ) );
 		}
@@ -106,55 +108,36 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 		if ( empty( $form_id ) ) {
 			return BWFCRM_Common::crm_error( __( 'Form Feed doesn\'t have sufficient data to get fields: ' . $feed_id, 'wp-marketing-automations-crm' ) );
 		}
-
+	
 		return $this->get_forminator_form_fields( $form_id );
 	}
 
 	public function get_forminator_form_fields( $form_id ) {
-		$form         = forminatorforms()->form->get( $form_id );
-		$form_content = forminatorforms_decode( $form->post_content );
+		$form         = $form  = Forminator_API::get_form_fields( $form_id );
 		$fields       = array();
 
-		if ( ! empty( $form_content['fields'] ) ) {
-			foreach ( $form_content['fields'] as $field ) {
-				if ( isset( $field['isHidden'] ) && $field['isHidden'] ) {
-					continue;
-				}
+		if ( ! empty( $form) ) {
+			foreach ( $form as $key => $field ) {
 
-				$fields[ $field['id'] ] = $field['label'];
-				if ( ! isset( $field['format'] ) || 'name' !== $field['type'] || 'simple' === $field['format'] ) {
-					continue;
-				}
-
-				unset( $fields[ $field['id'] ] );
-				$fields[ $field['id'] . '.1' ] = $field['label'] . ': First Name';
-				$fields[ $field['id'] . '.2' ] = $field['label'] . ': Last Name';
-
-				if ( 'first-middle-last' === $field['format'] ) {
-					$fields[ $field['id'] . '.3' ] = $field['label'] . ': Middle Name';
-				}
+				$fields[ $key  ] =$field->field_label;
 			}
 		}
 
 		return $fields;
 	}
-    //  working on this part for integration 
-    // how to get Forminator for selection 
-    //  for This I need to spend some time on Forminator form documentation
-    /// I am still working on getting form, form ids, and form data from forminator
-    // if you have any ideas please share them with me 
+	/**
+	 * Select form
+	 *
+	 */
+
+
 	public function get_form_selection( $args, $return_all_available = false ) {
 		/** Form ID Handling */
-		$args = array(
-			'post_type' => 'forminator_forms',
-			'post_status' => 'publish',
-			'order' => 'ASC',
-			'numberposts' => -1
+		$form_options = [];
+		$forms     = Forminator_API::get_forms( null, 1, 100, Forminator_Form_Model::STATUS_PUBLISH );
 
-		);
-		$forminator = get_posts($args);
-		foreach ( $forminator as $form ) {
-			$form_options[ $form->ID ] = $form->post_title;
+		foreach ( $forms as $form ) {
+			$form_options[ $form->id ] = $form->name;
 		}
 
 		$form_options = array( 'default' => $form_options );
@@ -204,7 +187,8 @@ class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 	}
 }
 
-
-BWFCRM_Core()->forms->register( 'forminator', 'BWFCRM_Form_Forminator', 'Forminator', array(
+if ( bwfan_is_forminator_forms_active() ) {
+	BWFCRM_Core()->forms->register( 'forminator', 'BWFCRM_Form_Forminator', 'Forminator', array(
 		'forminator_form_submit'
-) );
+	) );
+}
