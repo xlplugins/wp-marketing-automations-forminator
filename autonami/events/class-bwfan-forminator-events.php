@@ -219,22 +219,18 @@ final class BWFAN_FORMINATOR_Form_Submit extends BWFAN_Event {
 		$get_first_name    = $automation_data['event_meta']['bwfan-form-field-map']['bwfan_first_name_field_map'];
 		$get_last_name     = $automation_data['event_meta']['bwfan-form-field-map']['bwfan_last_name_field_map'];
 		$get_contact_phone = $automation_data['event_meta']['bwfan-form-field-map']['bwfan_phone_field_map'];
-
-
 		$email_map            = isset( $automation_data['entry'][ $get_email ] ) ? $automation_data['entry'][ $get_email ] : '';
-		$first_name_map       = isset( $automation_data['entry'][ $get_first_name ]['first-name'] ) ? $automation_data['entry'][ $get_first_name ] : '';
-		$last_name_map        = isset( $automation_data['entry'][ $get_last_name ]['last-name'] ) ? $automation_data['entry'][ $get_last_name ] : '';
+		$first_name_map       = isset( $automation_data['entry'][ $get_first_name ]) ? $automation_data['entry'][ $get_first_name ] : '';
+		$last_name_map        = isset( $automation_data['entry'][ $get_last_name ] ) ? $automation_data['entry'][ $get_last_name ] : '';
 		$phone_map            = isset( $automation_data['entry'][ $get_contact_phone ] ) ? $automation_data['entry'][ $get_contact_phone ] : '';
-		$this->mark_subscribe = isset( $automation_data['event_meta']['bwfan-mark-contact-subscribed'] ) ? $automation_data['event_meta']['bwfan-mark-contact-subscribed'] : 0;
-
 		$this->form_id       = BWFAN_Common::$events_async_data['form_id'];
 		$this->form_title    = BWFAN_Common::$events_async_data['form_title'];
 		$this->entry         = BWFAN_Common::$events_async_data['entry'];
 		$this->fields        = BWFAN_Common::$events_async_data['fields'];
 		$this->entry_id      = BWFAN_Common::$events_async_data['entry_id'];
 		$this->email         = ( ! empty( $email_map ) ) ? $email_map : '';
-		$this->first_name    = ( ! empty( $first_name_map['first-name'] ) ) ? $first_name_map['first-name'] : '';
-		$this->last_name     = ( ! empty( $last_name_map['last-name'] ) ) ? $last_name_map['last-name'] : '';
+		$this->first_name    = ( ! empty( $first_name_map)) ? $first_name_map : '';
+		$this->last_name     = ( ! empty( $last_name_map)) ? $last_name_map : '';
 		$this->contact_phone = ( ! empty( $phone_map ) ) ? $phone_map : '';
 
 		$automation_data['form_id']       = $this->form_id;
