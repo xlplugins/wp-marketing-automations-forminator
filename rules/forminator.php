@@ -11,8 +11,8 @@ if ( function_exists( 'bwfan_is_forminator_forms_active' ) && bwfan_is_forminato
 
 			public function get_possible_rule_operators() {
 				return array(
-					'is'           => __( 'is', 'autonami-automations-pro' ),
-					'is_not'       => __( 'is not', 'autonami-automations-pro' ),
+					'is'           => __( 'is', 'wp-marketing-automations' ),
+					'is_not'       => __( 'is not', 'wp-marketing-automations' ),
 					'contains'     => __( 'contains', 'wp-marketing-automations' ),
 					'not_contains' => __( 'does not contain', 'wp-marketing-automations' ),
 					'starts_with'  => __( 'starts with', 'wp-marketing-automations' ),
@@ -84,11 +84,23 @@ if ( function_exists( 'bwfan_is_forminator_forms_active' ) && bwfan_is_forminato
 						}
 						break;
 					case 'contains':
-						$value  = isset( $value[0] ) && ! empty( $value[0] ) ? $value[0] : '';
+						if ( is_array( $value ) ) {
+							$result = ! empty( array_filter( $value, function ( $element ) use ( $condition_value ) {
+								return strpos( $element, $condition_value ) !== false;
+							} ) );
+							break;
+						}
+
 						$result = strpos( $value, $condition_value ) !== false;
 						break;
 					case 'not_contains':
-						$value  = isset( $value[0] ) && ! empty( $value[0] ) ? $value[0] : '';
+						if ( is_array( $value ) ) {
+							$result = ! empty( array_filter( $value, function ( $element ) use ( $condition_value ) {
+								return strpos( $element, $condition_value ) === false;
+							} ) );
+							break;
+						}
+
 						$result = strpos( $value, $condition_value ) === false;
 						break;
 					case 'starts_with':
@@ -97,14 +109,19 @@ if ( function_exists( 'bwfan_is_forminator_forms_active' ) && bwfan_is_forminato
 						$result = substr( $value, 0, $length ) === $condition_value;
 						break;
 					case 'ends_with':
-						$value  = isset( $value[0] ) && ! empty( $value[0] ) ? $value[0] : '';
+						$value  = is_array( $value ) ? end( $value ) : $value;
 						$length = strlen( $condition_value );
-
-						if ( 0 === $length ) {
-							$result = true;
-						} else {
-							$result = substr( $value, - $length ) === $condition_value;
+						if ( 0 === $length || ( $length > strlen( $value ) ) ) {
+							$result = false;
+							break;
 						}
+						$result = substr( $value, - $length ) === $condition_value;
+						break;
+					case 'is_blank':
+						$result = empty( $value[0] );
+						break;
+					case 'is_not_blank':
+						$result = ! empty( $value[0] );
 						break;
 					default:
 						$result = false;

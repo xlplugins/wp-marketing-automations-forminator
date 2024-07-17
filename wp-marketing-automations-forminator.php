@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Plugin Name: Autonami Marketing Automations Forminator
- * Plugin URI: https://buildwoofunnels.com
- * Description:Formination with Autonami Marketing Automations
- * Version: 1.0.0
- * Author: WooFunnels
- * Author URI: https://buildwoofunnels.com
+ * Plugin Name: FunnelKit Automations - Forminator Addon
+ * Plugin URI: https://funnelkit.com/wordpress-marketing-automation-autonami/
+ * Description: Formination Integration. Works with FunnelKit Automations for WordPress
+ * Version: 2.0.0
+ * Author: FunnelKit
+ * Author URI: https://funnelkit.com
  * License: GPLv3 or later
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
- * Text Domain: autonami-automations-pro
+ * Text Domain: wp-marketing-automations
  */
 
 final class BWFAN_Forminator {
@@ -26,8 +26,8 @@ final class BWFAN_Forminator {
 	 * @return void
 	 */
 	public static function get_instance() {
-		if ( is_null( self::$_instance ) ) {
-			self::$_instance = new self();
+		if ( null === self::$_instance ) {
+			self::$_instance = new self;
 		}
 
 		return self::$_instance;
@@ -40,7 +40,7 @@ final class BWFAN_Forminator {
 	public function init_forminator() {
 
 		define( 'BWFAN_FORMINTOR_VERSION', '1.0.0' );
-		define( 'BWFAN_FORMINTOR_FULL_NAME', 'Autonami Marketing Automations FORMINTOR' );
+		define( 'BWFAN_FORMINTOR_FULL_NAME', 'FunnelKit Automations - Forminator Addon' );
 		define( 'BWFAN_FORMINTOR_PLUGIN_FILE', __FILE__ );
 		define( 'BWFAN_FORMINTOR_PLUGIN_DIR', __DIR__ );
 		define( 'BWFAN_FORMINTOR_PLUGIN_URL', untrailingslashit( plugin_dir_url( BWFAN_FORMINTOR_PLUGIN_FILE ) ) );

@@ -1,5 +1,5 @@
 <?php
-if ( class_exists( 'BWFCRM_Form_Base' ) ) {
+if ( class_exists( 'BWFCRM_Form_Base' ) && ! class_exists( 'BWFCRM_Form_Forminator' ) ) {
 	class BWFCRM_Form_Forminator extends BWFCRM_Form_Base {
 		private $total_selections = 1;
 		private $source = 'forminator';
@@ -73,16 +73,16 @@ if ( class_exists( 'BWFCRM_Form_Base' ) ) {
 		public function get_form_fields( $feed ) {
 
 			if ( ! $feed instanceof BWFCRM_Form_Feed ) {
-				return BWFCRM_Common::crm_error( __( 'Feed  not Exists: ', 'wp-marketing-automations-crm' ) );
+				return BWFCRM_Common::crm_error( __( 'Feed  not Exists: ', 'wp-marketing-automations' ) );
 			}
 			$feed_id = $feed->get_id();
 			if ( ! $feed->is_feed_exists() ) {
-				return BWFCRM_Common::crm_error( __( 'No Feed Exists: ' . $feed_id, 'wp-marketing-automations-crm' ) );
+				return BWFCRM_Common::crm_error( __( 'No Feed Exists: ' . $feed_id, 'wp-marketing-automations' ) );
 			}
 
 			$form_id = $feed->get_data( 'form_id' );
 			if ( empty( $form_id ) ) {
-				return BWFCRM_Common::crm_error( __( 'Form Feed doesn\'t have sufficient data to get fields: ' . $feed_id, 'wp-marketing-automations-crm' ) );
+				return BWFCRM_Common::crm_error( __( 'Form Feed doesn\'t have sufficient data to get fields: ' . $feed_id, 'wp-marketing-automations' ) );
 			}
 
 			return $this->get_forminator_form_fields( $form_id );
@@ -90,13 +90,13 @@ if ( class_exists( 'BWFCRM_Form_Base' ) ) {
 
 		public function get_forminator_form_fields( $form_id ) {
 			if ( empty( $form_id ) ) {
-				return BWFCRM_Common::crm_error( __( 'Form Feed doesn\'t have sufficient data to get fields: ' . $form_id, 'wp-marketing-automations-crm' ) );
+				return BWFCRM_Common::crm_error( __( 'Form Feed doesn\'t have sufficient data to get fields: ' . $form_id, 'wp-marketing-automations' ) );
 			}
 
 			/** @var BWFAN_FORMINATOR_Form_Submit $event */
 			$event = BWFAN_Core()->sources->get_event( 'forminator_form_submit' );
 			if ( ! $event instanceof BWFAN_FORMINATOR_Form_Submit ) {
-				return BWFCRM_Common::crm_error( __( 'Form Funnelkit Automations Event doesn\'t found for Feed: ' . $form_id, 'wp-marketing-automations-crm' ) );
+				return BWFCRM_Common::crm_error( __( 'Form Funnelkit Automations Event doesn\'t found for Feed: ' . $form_id, 'wp-marketing-automations' ) );
 			}
 
 			$finalarr = [];
@@ -150,13 +150,13 @@ if ( class_exists( 'BWFCRM_Form_Base' ) ) {
 		 */
 		public function update_form_selection( $args, $feed_id ) {
 			if ( empty( $feed_id ) ) {
-				return BWFCRM_Common::crm_error( __( 'Empty Feed ID provided', 'wp-marketing-automations-crm' ) );
+				return BWFCRM_Common::crm_error( __( 'Empty Feed ID provided', 'wp-marketing-automations' ) );
 			}
 
 			$form_id = isset( $args['form_id'] ) && ! empty( $args['form_id'] ) ? $args['form_id'] : false;
 			$feed    = new BWFCRM_Form_Feed( $feed_id );
 			if ( ! $feed->is_feed_exists() ) {
-				return BWFCRM_Common::crm_error( __( 'Feed with ID not exists: ' . $feed_id, 'wp-marketing-automations-crm' ) );
+				return BWFCRM_Common::crm_error( __( 'Feed with ID not exists: ' . $feed_id, 'wp-marketing-automations' ) );
 			}
 
 			if ( empty( $form_id ) && $this->source === $feed->get_source() ) {
